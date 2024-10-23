@@ -2,14 +2,14 @@
 ## Author: honeok
 ## Copyright (c) 2024 honeok
 ## Blog: www.honeok.com
-## Github: https://github.com/honeok/Tools
+## Github: https://github.com/honeok/Shell
 
 # =============== 全局变量 ==============
-remote_host="your_remote_host"           # 远程主机地址
-remote_port="your_remote_port"           # 远程主机端口
-file_path="path/to/your/local/file"      # 本地文件路径
-concurrent_uploads=1                     # 上传进程并发数量
-password="your_password"                 # 登录密码
+remote_host="remote_host"           # 远程主机地址
+remote_port="remote_port"           # 远程主机端口
+file_path="/localfile"              # 本地文件路径
+concurrent_uploads=1                # 上传进程并发数量
+password="remote_password"          # 登录密码
 
 # =============== 通用函数 ===============
 ## 安装软件包
