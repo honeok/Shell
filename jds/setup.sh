@@ -1,7 +1,5 @@
 #!/bin/bash
-# SPDX-License-Identifier: MIT
-# Copyright (c) 2024 honeok
-# Author: honeok yihaohey@gmail.com
+# Author: honeok
 # Blog: https://www.honeok.com
 #
 # Usage:
@@ -10,11 +8,9 @@
 set -o errexit
 set -o pipefail
 
-yellow='\033[1;33m'       # 黄色
-red='\033[1;31m'          # 红色
-green='\033[1;32m'        # 绿色
-purple='\033[1;35m'       # 紫色
-white='\033[0m'           # 白色
+yellow='\033[93m'        # 亮黄色
+red='\033[91m'           # 亮红色
+green='\033[92m'         # 亮绿色
 
 _yellow() { echo -e ${yellow}$@${white}; }
 _red() { echo -e ${red}$@${white}; }
@@ -46,7 +42,7 @@ if [[ "${1:-}" == "uninstall" ]]; then
         _yellow "删除Miniconda安装目录$install_dir"
         rm -fr "$install_dir" || { _red "删除Miniconda目录失败"; exit 1; }
     else
-        _red "$install_dir不存在,跳过删除"
+        _red "$install_dir不存在，跳过删除"
     fi
 
     # 删除环境变量
@@ -57,7 +53,7 @@ if [[ "${1:-}" == "uninstall" ]]; then
         _yellow "删除Conda虚拟环境py39"
         conda remove -n py39 --all --yes || { _red "删除py3.9虚拟环境失败"; exit 1; }
     else
-        _red "未找到py39虚拟环境,本次跳过"
+        _red "未找到py39虚拟环境，本次跳过"
     fi
 
     _green "卸载成功"
@@ -66,7 +62,7 @@ fi
 
 # 检查Conda是否已安装
 if command -v conda >/dev/null 2>&1; then
-    _yellow "Conda已经安装在系统中,跳过安装步骤"
+    _yellow "Conda已经安装在系统中，跳过安装步骤"
     exit 0
 fi
 
