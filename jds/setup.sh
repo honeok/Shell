@@ -27,79 +27,62 @@ installer="Miniconda3-py39_24.3.0-0-Linux-x86_64.sh"
 apiserver_dir="/data/bi/apiserver"
 ##############################
 
-print_logo(){
-    echo -e "${purple}\
-       _     _        _____                      
-      | |   | |      / ____|                     
-      | | __| |___  | |  __  __ _ _ __ ___   ___ 
-  _   | |/ _\` / __| | | |_ |/ _\` | '_ \` _ \ / _ \\
- | |__| | (_| \__ \ | |__| | (_| | | | | | |  __/
-  \____/ \__,_|___/  \_____|\\__,_|_| |_| |_|\___|${white}"
-}
-print_logo
-
-# 检查是否具有足够的权限
-#if [ "$(id -u)" -ne 0 ]; then
-#	_red "该脚本需要以root权限运行,请使用root用户执行"
-#	exit 1
-#fi
-
 remove_condaenv_init() {
-	grep -q '# >>> conda initialize >>>' ~/.bashrc && \
-		sed -i '/# >>> conda initialize >>>/,/# <<< conda initialize <<<$/d' ~/.bashrc && \
-		_green "已删除.bashrc中的Conda初始化配置块"
+    grep -q '# >>> conda initialize >>>' ~/.bashrc && \
+        sed -i '/# >>> conda initialize >>>/,/# <<< conda initialize <<<$/d' ~/.bashrc && \
+        _green "已删除.bashrc中的Conda初始化配置块"
 
-	grep -q '# commented out by conda initialize' ~/.bashrc && \
-		sed -i '/# commented out by conda initialize/d' ~/.bashrc && \
-		_green "已删除.bashrc中的Conda路径配置"
+    grep -q '# commented out by conda initialize' ~/.bashrc && \
+        sed -i '/# commented out by conda initialize/d' ~/.bashrc && \
+        _green "已删除.bashrc中的Conda路径配置"
 }
 
 # 检查是否为卸载操作
 if [[ "${1:-}" == "uninstall" ]]; then
-	_yellow "卸载Miniconda和相关配置"
+    _yellow "卸载Miniconda和相关配置"
 
-	# 删除Miniconda安装目录
-	if [ -d "$install_dir" ]; then
-		_yellow "删除Miniconda安装目录$install_dir"
-		rm -fr "$install_dir" || { _red "删除Miniconda目录失败"; exit 1; }
-	else
-		_red "$install_dir不存在,跳过删除"
-	fi
+    # 删除Miniconda安装目录
+    if [ -d "$install_dir" ]; then
+        _yellow "删除Miniconda安装目录$install_dir"
+        rm -fr "$install_dir" || { _red "删除Miniconda目录失败"; exit 1; }
+    else
+        _red "$install_dir不存在,跳过删除"
+    fi
 
-	# 删除环境变量
-	remove_condaenv_init
+    # 删除环境变量
+    remove_condaenv_init
 
-	# 检查并删除虚拟环境
-	if conda info --envs | grep -q 'py39'; then
-		_yellow "删除Conda虚拟环境py39"
-		conda remove -n py39 --all --yes || { _red "删除py3.9虚拟环境失败"; exit 1; }
-	else
-		_red "未找到py39虚拟环境,本次跳过"
-	fi
+    # 检查并删除虚拟环境
+    if conda info --envs | grep -q 'py39'; then
+        _yellow "删除Conda虚拟环境py39"
+        conda remove -n py39 --all --yes || { _red "删除py3.9虚拟环境失败"; exit 1; }
+    else
+        _red "未找到py39虚拟环境,本次跳过"
+    fi
 
-	_green "卸载成功"
-	exit 0
+    _green "卸载成功"
+    exit 0
 fi
 
 # 检查Conda是否已安装
 if command -v conda >/dev/null 2>&1; then
-	_yellow "Conda已经安装在系统中,跳过安装步骤"
-	exit 0
+    _yellow "Conda已经安装在系统中,跳过安装步骤"
+    exit 0
 fi
 
 # 根据IP地址确定下载链接
 if [[ "$(curl -s --connect-timeout 5 ipinfo.io/country)" == "CN" ]]; then
-	installer_url="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/$installer"
-	pypi_index_url="https://pypi.tuna.tsinghua.edu.cn/simple"
+    installer_url="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/$installer"
+    pypi_index_url="https://pypi.tuna.tsinghua.edu.cn/simple"
 else
-	installer_url="https://repo.anaconda.com/miniconda/$installer"
-	pypi_index_url="https://pypi.org/simple"
+    installer_url="https://repo.anaconda.com/miniconda/$installer"
+    pypi_index_url="https://pypi.org/simple"
 fi
 
 # 下载和安装Miniconda
 if [ ! -f "$installer" ]; then
-	_yellow "下载Miniconda安装程序"
-	curl -sL "$installer_url" -o "$installer" || { _red "下载安装程序失败"; exit 1; }
+    _yellow "下载Miniconda安装程序"
+    curl -sL "$installer_url" -o "$installer" || { _red "下载安装程序失败"; exit 1; }
 fi
 
 _yellow "安装Miniconda到$install_dir"
@@ -110,20 +93,20 @@ rm -f "$installer"
 
 # 配置全局环境变量
 if ! grep -q "$install_dir/bin" ~/.bashrc; then
-	_yellow "在.bashrc中添加Conda的PATH"
-	echo "export PATH=\"$install_dir/bin:\$PATH\"" >> ~/.bashrc
+    _yellow "在.bashrc中添加Conda的PATH"
+    echo "export PATH=\"$install_dir/bin:\$PATH\"" >> ~/.bashrc
 fi
 
 source ~/.bashrc
 
 # 验证Miniconda安装
 if ! conda --version >/dev/null 2>&1; then
-	_red "Conda安装错误"
-	# 删除安装目录和环境变量文件
-	[ -d "$install_dir" ] && rm -fr "$install_dir"
-	remove_condaenv_init
-	source ~/.bashrc
-	exit 1
+    _red "Conda安装错误"
+    # 删除安装目录和环境变量文件
+    [ -d "$install_dir" ] && rm -fr "$install_dir"
+    remove_condaenv_init
+    source ~/.bashrc
+    exit 1
 fi
 
 _yellow "更新Conda并安装Python3.9"
@@ -138,12 +121,12 @@ conda init || { _red "初始化Conda失败"; exit 1; }
 conda activate py39 || { _red "激活py39环境失败"; exit 1; }
 
 if [ ! -d "$apiserver_dir" ]; then
-	_red "$apiserver_dir目录不存在请检查路径"
-	# 删除安装目录和环境变量文件
-	[ -d "$install_dir" ] && rm -fr "$install_dir"
-	remove_condaenv_init
-	source ~/.bashrc
-	exit 1
+    _red "$apiserver_dir目录不存在请检查路径"
+    # 删除安装目录和环境变量文件
+    [ -d "$install_dir" ] && rm -fr "$install_dir"
+    remove_condaenv_init
+    source ~/.bashrc
+    exit 1
 fi
 
 _yellow "安装所需的Python包"
